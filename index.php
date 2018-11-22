@@ -60,7 +60,13 @@ while (true) {
                 shellOut("子进程消息：{$tmp[0]}已经执行！");
                 continue;
             }
-            
+            include_once 'task/' . $value;
+            //判断执行时间是否已经到了
+            $exec_time = $tmp[0]::getRunTime();
+            if ($exec_time['time'] != $now) {
+                shellOut("子进程消息：{$tmp[0]}未到运行时间！");
+                continue;
+            }
             //新建进程执行
             $pid = pcntl_fork();
             if ($pid == -1) {
@@ -75,15 +81,6 @@ while (true) {
                 );
                 shellOut("创建{$tmp[0]}子进程成功，并进入线程池监控");
             } else {// 子进程处理
-                include_once 'task/' . $value;
-                //判断执行时间是否已经到了
-                $exec_time = $tmp[0]::getRunTime();
-                if ($exec_time['time'] != $now) {
-                    shellOut("子进程消息：{$tmp[0]}未到运行时间！");
-                    exit;
-                }
-
-                $childStartTime = time();
                 $out[] = array(
                     'taskName' => $tmp[0]::getTaskName(),
                     'runTime' => $tmp[0]::getRunTime(),
