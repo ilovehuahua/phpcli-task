@@ -39,7 +39,7 @@ if(!empty($argv[2])){
         shellOut("now you are in debug model!", 1);
     }
 }
-
+shellOut("now you are in release model!", 1);
 //加载配置文件
 if ($runType == 1) {
     include_once 'conf/conf_test.php';
@@ -47,14 +47,14 @@ if ($runType == 1) {
     include_once 'conf/conf.php';
 }
 shellOut("init conf success!", 1);
-
+shellOut("php task application run success,now you can close the shell windows.", 1);
 //循环执行任务
 while (true) {
     //每隔1秒执行一次。
     sleep(1);
     $now = date("H:i:s");
     $date = date("Y-m-d");
-    shellOut("task is running...");
+    $debug&&shellOut("task is running...");
     //遍历扫描task文件
     if (date("s") == 0) {
         //每分钟检查task文件列表
