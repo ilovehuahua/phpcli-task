@@ -80,6 +80,14 @@ while (true) {
                 $out = pcntl_waitpid($value, $status, WNOHANG);
                 echo $i.":\n";
                 var_dump($out);
+                if($out==0){
+                    echo "正在运行...\n";
+                }else if($out<0){
+                    echo "子进程{$value}出错\n";
+                }else{
+                    echo "子进程{$value}运行成功\n";
+                    unset($processPool[$key]);
+                }
             }
         } else {
             break;
