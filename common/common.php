@@ -28,5 +28,11 @@ function my_dir($dir) {
 }
 
 /**
- * 判断是不是到了执行时间
+ * shell输出
  */
+function shellOut($str,$wait=0) {
+    if($wait===1){
+        usleep(200000);
+    }
+    echo date("Y-m-d H:i:s")."  ".$str."\n";
+}

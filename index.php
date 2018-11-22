@@ -1,12 +1,24 @@
 <?php
 
 /**
- * cli运行环境
+ * php定时任务
  * @author xunyu
  * @date 2018-11-21
  */
-include_once 'model/dbModel.php';
+
+//只允许cli运行
+$sapi_type = php_sapi_name();
+if($sapi_type!='cli'){
+    exit("only allow run in cli model!");
+}
+$str= "---------------------------------\nPHP timer task starts running...\n@author zenbaowow\n@date 2018-11-21\n---------------------------------\n";
+echo $str;
+
 include_once 'common/common.php';
+shellOut("init common Function success!",1);
+
+include_once 'model/dbModel.php';
+shellOut("init DBModel success!",1);
 $runType = 0;
 
 //判断运行环境
@@ -23,9 +35,15 @@ if ($runType == 1) {
 } else {
     include_once 'conf/conf.php';
 }
+shellOut("init conf success!",1);
 
 //循环执行任务
 while (true) {
+    //每隔1秒执行一次。
+    sleep(1);
+    $now= date("H:i:s");
+    $date= date("Y-m-d");
+    shellOut("task check");
     //遍历扫描task文件
     $fires = my_dir("task/");
     foreach ($fires as $key => $value) {
@@ -35,7 +53,7 @@ while (true) {
             break;
         }
     }
-
+    
     if (!empty($fires)) {
         foreach ($fires as $key => $value) {
             include_once 'task/' . $value;
@@ -43,22 +61,28 @@ while (true) {
 
             //判断执行时间是否已经到了
             $exec_time = $tmp[0]::getRunTime();
+            if($exec_time!=$now){
+                continue;
+            }
 
             //判断是否已经执行过了
+            if ($$date[$tmp[0]]==1) {
+                //这个任务今天已经执行，那么跳过
+                continue;
+            }
             //新建进程执行
             $pid = pcntl_fork();
             if ($pid == -1) {
-                die("could not fork");
+                shellOut("创建{$tmp[0]}子进程失败");
             } elseif ($pid) {
-                echo "I'm the Parent $i\n";
-                $proc = pcntl_waitpid($pid, $status, WNOHANG);
-                var_dump($proc);
-                if ($proc == 0) {
                     //进入进程池进行监控
-                    $processPool[] = $pid;
-                } else if ($proc == -1) {
-                    echo "子进程出错！";
-                }
+                    $processPool[] = array(
+                        'pid'=>$pid,
+                        'taskName'=>$tmp[0],
+                        'watchTimes'=>1
+                    );
+                    shellOut("创建{$tmp[0]}子进程成功，并进入线程池监控");
+                    $$date[$tmp[0]]=1;
             } else {// 子进程处理
                 $out[] = array(
                     'taskName' => $tmp[0]::getTaskName(),
@@ -66,36 +90,33 @@ while (true) {
                     'responsiblePeopleName' => $tmp[0]::getResponsiblePeopleName(),
                     'out' => $tmp[0]::run()
                 );
-                var_dump($out);
+                //保存执行结果TODO
+                shellOut("子进程{$tmp[0]}运行成功，返回结果：". json_encode($out));
                 exit;
             }
-            //保存执行结果
+            
         }
     }
-    $i=0;
-    while (true) {
-        $i++;
-        if (!empty($processPool)) {
-            foreach ($processPool as $key => $value) {
-                $out = pcntl_waitpid($value, $status, WNOHANG);
-                echo $i.":\n";
-                var_dump($out);
-                if($out==0){
-                    echo "正在运行...\n";
-                }else if($out<0){
-                    echo "子进程{$value}出错\n";
-                }else{
-                    echo "子进程{$value}运行成功\n";
-                    unset($processPool[$key]);
-                }
+
+    //检查进程池
+    if (!empty($processPool)) {
+        foreach ($processPool as $key => $value) {
+            $out = pcntl_waitpid($value['pid'], $status, WNOHANG);
+            $str= "第" . $value['watchTimes'] . "次检查" . $value['pid'] . "进程" ;
+            shellOut($str);
+            if ($out == 0) {
+                $processPool[$key]['watchTimes']++;
+                $str= "子进程{$value['pid']}正在运行...";
+            } else if ($out < 0) {
+                $str= "子进程{$value['pid']}出错";
+                shellOut($str);
+            } else {
+                $str= "子进程{$value['pid']}运行成功";
+                unset($processPool[$key]);
             }
-        } else {
-            break;
+            shellOut($str);
         }
-        //等待100毫秒等待子进程执行
-        usleep(100000);
     }
 
-
-    break;
+    $end= date("H:i:d");
 }
