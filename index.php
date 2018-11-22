@@ -13,11 +13,11 @@ if($sapi_type!='cli'){
 }
 $str= "---------------------------------\nPHP timer task starts running...\n@author zenbaowow\n@date 2018-11-21\n---------------------------------\n";
 echo $str;
-ini_set('date.timezone','Asia/Shanghai');
-shellOut("init timezone success!",1);
 include_once 'common/common.php';
 shellOut("init common Function success!",1);
 
+ini_set('date.timezone','Asia/Shanghai');
+shellOut("init timezone success!",1);
 include_once 'model/dbModel.php';
 shellOut("init DBModel success!",1);
 $runType = 0;
