@@ -62,7 +62,7 @@ while (true) {
 
             //判断执行时间是否已经到了
             $exec_time = $tmp[0]::getRunTime();
-            if($exec_time!=$now){
+            if($exec_time['time']!=$now){
                 continue;
             }
 
