@@ -13,6 +13,7 @@ if ($sapi_type != 'cli') {
 $str = "---------------------------------\nPHP timer task starts running...\n@author zenbaowow\n@date 2018-11-21\n---------------------------------\n";
 echo $str;
 include_once 'common/common.php';
+include_once 'common/dir.php';
 shellOut("init common Function success!", 1);
 
 ini_set('date.timezone', 'Asia/Shanghai');
@@ -47,7 +48,7 @@ while (true) {
     //遍历扫描task文件
     if (date("s") == 0) {
         //每分钟检查task文件列表
-        $fires = checkDir::checkDir("task/");
+        $fires = Dir::checkDir("task/");
     }
 
     if (!empty($fires)) {
@@ -118,27 +119,4 @@ while (true) {
     }
 }
 
-/**
- * 文件操作，文件检查
- */
-class Dir {
 
-    /**
-     * 检查文件夹下文件
-     * @param type $url
-     * @return type
-     */
-    public static function checkDir($url) {
-        //遍历扫描task文件
-        $fires = my_dir("task/");
-        foreach ($fires as $key => $value) {
-            //剔除接口
-            if ($value == 'taskInterface.php') {
-                unset($fires[$key]);
-                break;
-            }
-        }
-        return $fires;
-    }
-
-}
