@@ -54,19 +54,26 @@ while (true) {
     if (!empty($fires)) {
         foreach ($fires as $key => $value) {
             $tmp = explode('.', $value);
+            //判断是否已经执行过了
+            if (isset(${"task" . $date}[$tmp[0]])&&${"task" . $date}[$tmp[0]] == 1) {
+                //这个任务今天已经执行，那么跳过
+                shellOut("子进程消息：{$tmp[0]}已经执行！");
+                continue;
+            }
+            
             //新建进程执行
             $pid = pcntl_fork();
             if ($pid == -1) {
                 shellOut("创建{$tmp[0]}子进程失败");
             } elseif ($pid) {
                 //进入进程池进行监控
+                ${"task" . $date}[$tmp[0]] = 1;
                 $processPool[] = array(
                     'pid' => $pid,
                     'taskName' => $tmp[0],
                     'watchTimes' => 1
                 );
                 shellOut("创建{$tmp[0]}子进程成功，并进入线程池监控");
-                ${"task" . $date}[$tmp[0]] = 1;
             } else {// 子进程处理
                 include_once 'task/' . $value;
                 //判断执行时间是否已经到了
@@ -76,15 +83,7 @@ while (true) {
                     exit;
                 }
 
-                //判断是否已经执行过了
-                if (${"task" . $date}[$tmp[0]] == 1) {
-                    //这个任务今天已经执行，那么跳过
-                    shellOut("子进程消息：{$tmp[0]}已经执行！");
-                    exit;
-                }
-                
                 $childStartTime = time();
-                shellOut("子进程{$tmp[0]}开始执行...");
                 $out[] = array(
                     'taskName' => $tmp[0]::getTaskName(),
                     'runTime' => $tmp[0]::getRunTime(),
