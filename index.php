@@ -53,6 +53,7 @@ while (true) {
 
     if (!empty($fires)) {
         foreach ($fires as $key => $value) {
+            $tmp = explode('.', $value);
             //新建进程执行
             $pid = pcntl_fork();
             if ($pid == -1) {
@@ -68,8 +69,6 @@ while (true) {
                 ${"task" . $date}[$tmp[0]] = 1;
             } else {// 子进程处理
                 include_once 'task/' . $value;
-                $tmp = explode('.', $value);
-
                 //判断执行时间是否已经到了
                 $exec_time = $tmp[0]::getRunTime();
                 if ($exec_time['time'] != $now) {
