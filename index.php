@@ -51,8 +51,14 @@ while (true) {
                 die("could not fork");
             } elseif ($pid) {
                 echo "I'm the Parent $i\n";
-                pcntl_waitpid($pid, $status,WNOHANG);
-                var_dump($status);
+                $proc = pcntl_waitpid($pid, $status, WNOHANG);
+                var_dump($proc);
+                if ($proc == 0) {
+                    //进入进程池进行监控
+                    $processPool[] = $pid;
+                } else if ($proc == -1) {
+                    echo "子进程出错！";
+                }
             } else {// 子进程处理
                 $out[] = array(
                     'taskName' => $tmp[0]::getTaskName(),
@@ -66,5 +72,22 @@ while (true) {
             //保存执行结果
         }
     }
+    $i=0;
+    while (true) {
+        $i++;
+        if (!empty($processPool)) {
+            foreach ($processPool as $key => $value) {
+                $out = pcntl_waitpid($value, $status, WNOHANG);
+                echo $i.":\n";
+                var_dump($out);
+            }
+        } else {
+            break;
+        }
+        //等待100毫秒等待子进程执行
+        usleep(100000);
+    }
+
+
     break;
 }
