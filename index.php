@@ -44,7 +44,7 @@ while (true) {
     sleep(1);
     $now= date("H:i:s");
     $date= date("Y-m-d");
-    shellOut("task check");
+    shellOut("task check start...");
     //遍历扫描task文件
     $fires = my_dir("task/");
     foreach ($fires as $key => $value) {
@@ -67,7 +67,7 @@ while (true) {
             }
 
             //判断是否已经执行过了
-            if ($$date[$tmp[0]]==1) {
+            if (${"task".$date}[$tmp[0]]==1) {
                 //这个任务今天已经执行，那么跳过
                 continue;
             }
@@ -83,8 +83,10 @@ while (true) {
                         'watchTimes'=>1
                     );
                     shellOut("创建{$tmp[0]}子进程成功，并进入线程池监控");
-                    $$date[$tmp[0]]=1;
+                    ${"task".$date}[$tmp[0]]=1;
             } else {// 子进程处理
+                $childStartTime= time();
+                shellOut("子进程{$tmp[0]}开始执行...");
                 $out[] = array(
                     'taskName' => $tmp[0]::getTaskName(),
                     'runTime' => $tmp[0]::getRunTime(),
@@ -92,7 +94,7 @@ while (true) {
                     'out' => $tmp[0]::run()
                 );
                 //保存执行结果TODO
-                shellOut("子进程{$tmp[0]}运行成功，返回结果：". json_encode($out));
+                shellOut("子进程{$tmp[0]}结束运行，返回结果：". json_encode($out));
                 exit;
             }
             
@@ -118,6 +120,5 @@ while (true) {
             shellOut($str);
         }
     }
-
-    $end= date("H:i:d");
+    shellOut("task check end...");
 }
