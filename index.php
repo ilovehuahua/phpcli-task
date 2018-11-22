@@ -73,13 +73,15 @@ while (true) {
                 //判断执行时间是否已经到了
                 $exec_time = $tmp[0]::getRunTime();
                 if ($exec_time['time'] != $now) {
-                    continue;
+                    shellOut("子进程消息：{$tmp[0]}未到运行时间！");
+                    exit;
                 }
 
                 //判断是否已经执行过了
                 if (${"task" . $date}[$tmp[0]] == 1) {
                     //这个任务今天已经执行，那么跳过
-                    continue;
+                    shellOut("子进程消息：{$tmp[0]}已经执行！");
+                    exit;
                 }
                 
                 $childStartTime = time();
