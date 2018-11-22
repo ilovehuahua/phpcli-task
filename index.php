@@ -10,7 +10,7 @@ $sapi_type = php_sapi_name();
 if ($sapi_type != 'cli') {
     exit("only allow run in cli model!");
 }
-$str = "---------------------------------\nPHP timer task starts running...\n@author zenbaowow\n@date 2018-11-21\n---------------------------------\n";
+$str = "\n---------------------------------\nPHP timer task starts running...\n@author zenbaowow\n@date 2018-11-21\n---------------------------------\n";
 echo $str;
 include_once 'common/common.php';
 include_once 'common/dir.php';
@@ -20,13 +20,23 @@ ini_set('date.timezone', 'Asia/Shanghai');
 shellOut("init timezone success!", 1);
 include_once 'model/dbModel.php';
 shellOut("init DBModel success!", 1);
+//1为生产环境
 $runType = 0;
-
+//1为debug模式
+$debug=0;
 //判断运行环境
 if (!empty($argv[1])) {
     if ($argv[1] == "test") {
         //测试环境
         $runType = 1;
+    }
+}
+
+//判断是不是debug
+if(!empty($argv[2])){
+    if($argv[2]=='debug'){
+        $debug=1;
+        shellOut("now you are in debug model!", 1);
     }
 }
 
@@ -57,14 +67,14 @@ while (true) {
             //判断是否已经执行过了
             if (isset(${"task" . $date}[$tmp[0]])&&${"task" . $date}[$tmp[0]] == 1) {
                 //这个任务今天已经执行，那么跳过
-                shellOut("子进程消息：{$tmp[0]}已经执行！");
+                $debug&&shellOut("子进程消息：{$tmp[0]}已经执行！");
                 continue;
             }
             include_once 'task/' . $value;
             //判断执行时间是否已经到了
             $exec_time = $tmp[0]::getRunTime();
             if ($exec_time['time'] != $now) {
-                shellOut("子进程消息：{$tmp[0]}未到运行时间！");
+                $debug&&shellOut("子进程消息：{$tmp[0]}未到运行时间！");
                 continue;
             }
             //新建进程执行
@@ -79,7 +89,7 @@ while (true) {
                     'taskName' => $tmp[0],
                     'watchTimes' => 1
                 );
-                shellOut("创建{$tmp[0]}子进程成功，并进入线程池监控");
+                $debug&&shellOut("创建{$tmp[0]}子进程成功，并进入线程池监控");
             } else {// 子进程处理
                 $out[] = array(
                     'taskName' => $tmp[0]::getTaskName(),
@@ -88,7 +98,7 @@ while (true) {
                     'out' => $tmp[0]::run()
                 );
                 //保存执行结果TODO
-                shellOut("子进程{$tmp[0]}结束运行，返回结果：" . json_encode($out));
+                $debug&&shellOut("子进程{$tmp[0]}结束运行，返回结果：" . json_encode($out));
                 exit;
             }
 
@@ -99,16 +109,16 @@ while (true) {
     if (!empty($processPool)) {
         foreach ($processPool as $key => $value) {
             $out = pcntl_waitpid($value['pid'], $status, WNOHANG);
-            $str = "第" . $value['watchTimes'] . "次检查" . $value['pid'] . "进程";
+            $debug&&$str = "第" . $value['watchTimes'] . "次检查" . $value['pid'] . "进程";
             shellOut($str);
             if ($out == 0) {
                 $processPool[$key]['watchTimes'] ++;
-                $str = "子进程{$value['pid']}正在运行...";
+                $str = "子进程{$value['pid']}正在运行{$value['taskName']}...";
             } else if ($out < 0) {
                 $str = "子进程{$value['pid']}出错";
                 shellOut($str);
             } else {
-                $str = "子进程{$value['pid']}运行成功";
+                $str = "子进程{$value['pid']}运行成功，并已成功退出";
                 unset($processPool[$key]);
             }
             shellOut($str);
