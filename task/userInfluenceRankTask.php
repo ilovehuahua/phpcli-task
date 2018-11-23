@@ -36,7 +36,7 @@ class userInfluenceRankTask implements task {
         $sql_arr=[];
         while ($row = mysqli_fetch_assoc($out)) {
             $sql_arr[]= array(
-                'user_id'=>$row['user_id'],
+                'user_id'=>$row['id'],
                 'date'=>$yes_date,
                 'all_score'=>$row['all_score'],
                 'area_rank'=>$row['area_rank'],

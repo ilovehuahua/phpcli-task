@@ -39,10 +39,26 @@ class dbModel {
         $sql = 'INSERT INTO ' . $table . " (" . $field . ") values (";
         $sql_v = '';
         foreach ($arr as $key => $value) {
-            if (empty($sql_v)) {
-                $sql_v = '\'' . $value . '\'';
+            //判断是不是有多个插入
+            if (is_array($value)) {
+                //多条数据
+                if (!empty($sql_v)) {
+                    $sql_v .= "),(";
+                }
+                foreach ($value as $key_arr => $value_arr) {
+                    if (empty($sql_v)) {
+                        $sql_v = '\'' . $value_arr . '\'';
+                    } else {
+                        $sql_v .= ', \'' . $value_arr . '\'';
+                    }
+                }
             } else {
-                $sql_v .= ', \'' . $value . '\'';
+                //单条数据
+                if (empty($sql_v)) {
+                    $sql_v = '\'' . $value . '\'';
+                } else {
+                    $sql_v .= ', \'' . $value . '\'';
+                }
             }
         }
         $sql .= $sql_v . ")";
