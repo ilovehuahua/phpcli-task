@@ -29,14 +29,21 @@ class userInfluenceRankTask implements task {
     public static function run() {
         $con = dbModel::connect(conf::$DB['DB_HOST'], conf::$DB['DB_USERNAME'], conf::$DB['DB_PASSWORD'], conf::$DB['DB_DATABASE'], conf::$DB['DB_PORT']);
         $date=date("Y-m-d");
+        $yes_date= date("Y-m-d", strtotime("- 1 day"));
         //计算截止昨天的数据
         $out = $con->query(sprintf(self::$sql, $date));
         $con->close();
         while ($row = mysqli_fetch_assoc($out)) {
-            $out[]= array_merge($row,array('date'=>$date));
+            $out[]= array(
+                'user_id'=>$row['user_id'],
+                'date'=>$yes_date,
+                'all_score'=>$row['all_score'],
+                'area_rank'=>$row['area_rank'],
+                'all_rank'=>$row['all_rank']
+            );
         }
         var_dump($out);
-        return dbModel::insert($con, 'user_influence_daily_statistics', 'user_id,all_score,area_rank,all_rank,date', $out);
+        return dbModel::insert($con, 'user_influence_daily_statistics', 'user_id,date,all_score,area_rank,all_rank', $out);
     }
     /**
      *计算数据的sql
