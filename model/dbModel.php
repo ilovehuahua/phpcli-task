@@ -48,7 +48,7 @@ class dbModel {
                 $arr_tmp=0;
                 foreach ($value as $key_arr => $value_arr) {
                     if (empty($arr_tmp)) {
-                        $sql_v = '\'' . $value_arr . '\'';
+                        $sql_v .= '\'' . $value_arr . '\'';
                     } else {
                         $sql_v .= ', \'' . $value_arr . '\'';
                     }
