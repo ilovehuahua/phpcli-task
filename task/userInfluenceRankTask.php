@@ -33,12 +33,14 @@ class userInfluenceRankTask implements task {
         $out = $con->query(sprintf(self::$sql, $date));
         $con->close();
         while ($row = mysqli_fetch_assoc($out)) {
-            var_dump($row);
+            $out[]= array_merge($row,array('date'=>$date));
         }
-        return 12345;
+        var_dump($out);
+        return dbModel::insert($con, 'user_influence_daily_statistics', 'user_id,all_score,area_rank,all_rank,date', $out);
     }
     /**
      *计算数据的sql
+     * 时间复杂度为用户数量O(n^2)
      * @var type 
      */
     public static $sql=<<<HERE
