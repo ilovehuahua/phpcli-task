@@ -32,7 +32,6 @@ class userInfluenceRankTask implements task {
         $yes_date= date("Y-m-d", strtotime("- 1 day"));
         //计算截止昨天的数据
         $out = $con->query(sprintf(self::$sql, $date));
-        $con->close();
         $sql_arr=[];
         while ($row = mysqli_fetch_assoc($out)) {
             $sql_arr[]= array(
@@ -44,7 +43,9 @@ class userInfluenceRankTask implements task {
             );
         }
         var_dump($sql_arr);
-        return dbModel::insert($con, 'user_influence_daily_statistics', 'user_id,date,all_score,area_rank,all_rank', $sql_arr);
+        $out=dbModel::insert($con, 'user_influence_daily_statistics', 'user_id,date,all_score,area_rank,all_rank', $sql_arr);
+        $con->close();
+        return $out;
     }
     /**
      *计算数据的sql
