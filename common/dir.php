@@ -1,6 +1,7 @@
 <?php
 /**
  * 文件操作，文件检查
+ * @author xunyu
  */
 class Dir {
 

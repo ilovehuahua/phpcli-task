@@ -6,7 +6,7 @@ include_once 'model/dbModel.php';
 /**
  * Description of userInfluenceRankTask
  *
- * @author hunliji
+ * @author xunyu
  */
 class userInfluenceRankTask implements task {
 
@@ -43,7 +43,6 @@ class userInfluenceRankTask implements task {
             );
         }
         $con->close();
-        var_dump($sql_arr);
         $out=dbModel::insert($con2=dbModel::connect(conf::$DB['DB_HOST'], conf::$DB['DB_USERNAME'], conf::$DB['DB_PASSWORD'], conf::$DB['DB_DATABASE'], conf::$DB['DB_PORT']), 'user_influence_daily_statistics', 'user_id,date,all_score,area_rank,all_rank', $sql_arr);
         $con2->close();
         return $out;
