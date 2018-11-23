@@ -33,8 +33,9 @@ class userInfluenceRankTask implements task {
         //计算截止昨天的数据
         $out = $con->query(sprintf(self::$sql, $date));
         $con->close();
+        $sql_arr=[];
         while ($row = mysqli_fetch_assoc($out)) {
-            $out[]= array(
+            $sql_arr[]= array(
                 'user_id'=>$row['user_id'],
                 'date'=>$yes_date,
                 'all_score'=>$row['all_score'],
@@ -42,8 +43,8 @@ class userInfluenceRankTask implements task {
                 'all_rank'=>$row['all_rank']
             );
         }
-        var_dump($out);
-        return dbModel::insert($con, 'user_influence_daily_statistics', 'user_id,date,all_score,area_rank,all_rank', $out);
+        var_dump($sql_arr);
+        return dbModel::insert($con, 'user_influence_daily_statistics', 'user_id,date,all_score,area_rank,all_rank', $sql_arr);
     }
     /**
      *计算数据的sql
