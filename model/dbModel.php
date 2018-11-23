@@ -45,12 +45,14 @@ class dbModel {
                 if (!empty($sql_v)) {
                     $sql_v .= "),(";
                 }
+                $arr_tmp=0;
                 foreach ($value as $key_arr => $value_arr) {
-                    if (empty($sql_v)) {
+                    if (empty($arr_tmp)) {
                         $sql_v = '\'' . $value_arr . '\'';
                     } else {
                         $sql_v .= ', \'' . $value_arr . '\'';
                     }
+                    $arr_tmp=1;
                 }
             } else {
                 //单条数据
