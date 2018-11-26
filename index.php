@@ -58,7 +58,7 @@ while (true) {
     //遍历扫描task文件
     if (date("s") == 0) {
         //每分钟检查task文件列表
-        $fires = Dir::checkDir("task/");
+        $fires = Dir::checkDir(__DIR__."task/");
     }
 
     if (!empty($fires)) {
