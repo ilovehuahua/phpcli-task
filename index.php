@@ -6,10 +6,16 @@
  * @date 2018-11-21
  */
 //只允许cli运行
+header('content-type:text/html;charset=utf-8'); 
 $sapi_type = php_sapi_name();
+//必须处理模式
 if ($sapi_type != 'cli') {
     exit("only allow run in cli model!");
 }
+// 必须加载扩展  
+if (!function_exists("pcntl_fork")) {  
+    die("pcntl extention is must !");  
+} 
 $str = "\n---------------------------------\nPHP timer task starts running...\n@author zenbaowow\n@date 2018-11-21\n---------------------------------\n";
 echo $str;
 include_once 'common/common.php';
