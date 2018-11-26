@@ -1,7 +1,6 @@
 <?php
 
 include_once 'taskInterface.php';
-include_once 'model/dbModel.php';
 
 /**
  * Description of userInfluenceRankTask
