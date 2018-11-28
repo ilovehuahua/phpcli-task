@@ -34,5 +34,9 @@ function shellOut($str,$wait=0) {
     if($wait===1){
         usleep(200000);
     }
-    echo date("Y-m-d H:i:s")."  ".$str."\n";
+    $txt=date("Y-m-d H:i:s")."  ".$str."\n";
+    echo $txt;
+    $myfile = fopen("./log/log.txt", "w") or die("Unable to open file!");
+    fwrite($myfile, $txt);
+    fclose($myfile);
 }
