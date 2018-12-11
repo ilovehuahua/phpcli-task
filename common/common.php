@@ -39,7 +39,7 @@ function shellOut($str,$wait=0) {
         echo $txt;
     }
     $date= date("Ymd");
-    $myfile = fopen("./log/".$date."_log.txt", "a") or die("Unable to open file!");
+    $myfile = fopen(__DIR__ ."/log/".$date."_log.txt", "a") or die("Unable to open file!");
     fwrite($myfile, $txt);
     fclose($myfile);
 }
