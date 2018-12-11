@@ -82,7 +82,7 @@ FROM
     WHERE
         a.deleted_at IS NULL
             AND b.deleted_at IS NULL
-            AND b.created_at < '2018-11-23'
+            AND b.created_at < '%s'
     GROUP BY a.id
     ORDER BY a.id ASC) a
     JOIN (SELECT 
