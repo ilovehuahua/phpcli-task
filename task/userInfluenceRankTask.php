@@ -30,7 +30,7 @@ class userInfluenceRankTask implements task {
         $date=date("Y-m-d");
         $yes_date= date("Y-m-d", strtotime("- 1 day"));
         //计算截止昨天的数据
-        $out = $con->query(sprintf(self::$sql, $date));
+        $out = $con->query(sprintf(self::$sql, $date,$date));
         $sql_arr=[];
         while ($row = mysqli_fetch_assoc($out)) {
             $sql_arr[]= array(
