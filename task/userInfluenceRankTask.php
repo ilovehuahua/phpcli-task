@@ -17,7 +17,7 @@ class userInfluenceRankTask implements task {
         return array(
             'type' => "every_day",
             'time_interval' => "once",
-            'time' => "02:00:10"
+            'time' => "00:00:10"
         );
     }
 
