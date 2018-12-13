@@ -18,13 +18,13 @@ if (!function_exists("pcntl_fork")) {
 }
 $str = "\n---------------------------------\nPHP timer task starts running...\n@author zenbaowow\n@date 2018-11-21\n---------------------------------\n";
 echo $str;
-include_once 'common/common.php';
-include_once 'common/dir.php';
+include_once __DIR__ .'/common/common.php';
+include_once __DIR__ .'/common/dir.php';
 shellOut("init common Function success!", 1);
 
 ini_set('date.timezone', 'Asia/Shanghai');
 shellOut("init timezone success!", 1);
-include_once 'model/dbModel.php';
+include_once __DIR__ .'/model/dbModel.php';
 shellOut("init DBModel success!", 1);
 //1为生产环境
 $runType = 0;
@@ -48,9 +48,9 @@ if (!empty($argv[2])) {
 shellOut("now you are in release model!", 1);
 //加载配置文件
 if ($runType == 1) {
-    include_once 'conf/conf_test.php';
+    include_once __DIR__ .'/conf/conf_test.php';
 } else {
-    include_once 'conf/conf.php';
+    include_once __DIR__ .'/conf/conf.php';
 }
 shellOut("init conf success!", 1);
 shellOut("php task application run success,now you can close the shell windows.", 1);
@@ -62,20 +62,17 @@ while (true) {
         $now = date("H:i:s");
         $date = date("Y-m-d");
         //遍历扫描task文件
-        if (date("s") == 0) {
-            //每分钟检查task文件列表
-            $fires = Dir::checkDir(__DIR__ . "/task/");
-        }
+        $fires = Dir::checkDir(__DIR__ . "/task/");
 
         if (!empty($fires)) {
             foreach ($fires as $key => $value) {
                 $tmp = explode('.', $value);
                 //判断是否已经执行过了
-                if (isset(${"task" . $date}[$tmp[0]]) && ${"task" . $date}[$tmp[0]] == 1) {
+              if (isset(${"task" . $date}[$tmp[0]]) && ${"task" . $date}[$tmp[0]] == 1) {
                     //这个任务今天已经执行，那么跳过
-                    continue;
+                   continue;
                 }
-                include_once 'task/' . $value;
+                include_once __DIR__ .'/task/' . $value;
                 //判断执行时间是否已经到了
                 $exec_time = $tmp[0]::getRunTime();
                 if ($exec_time['time'] != $now) {
@@ -102,7 +99,7 @@ while (true) {
                         'out' => $tmp[0]::run()
                     );
                     //保存执行结果TODO
-                    shellOut("子进程{$tmp[0]}结束运行，返回结果：" . json_encode($out));
+                    shellOut("子进程{$tmp[0]}结束运行，返回结果：" . json_encode($out,0,1));
                     exit;
                 }
             }
@@ -111,13 +108,13 @@ while (true) {
         //检查进程池
         if (!empty($processPool)) {
             foreach ($processPool as $key => $value) {
-                $out = pcntl_waitpid($value['pid'], $status, WNOHANG);
-                $debug && $str = "第" . $value['watchTimes'] . "次检查" . $value['pid'] . "进程";
+                $flag = pcntl_waitpid($value['pid'], $status, WNOHANG);
+                $str = "第" . $value['watchTimes'] . "次检查" . $value['pid'] . "进程";
                 shellOut($str);
-                if ($out == 0) {
+                if ($flag == 0) {
                     $processPool[$key]['watchTimes'] ++;
                     $str = "子进程{$value['pid']}正在运行{$value['taskName']}...";
-                } else if ($out < 0) {
+                } else if ($flag < 0) {
                     $str = "子进程{$value['pid']}出错";
                     shellOut($str);
                 } else {

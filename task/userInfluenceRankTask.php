@@ -1,6 +1,6 @@
 <?php
 
-include_once 'taskInterface.php';
+include_once __DIR__ .'/taskInterface.php';
 
 /**
  * Description of userInfluenceRankTask
@@ -42,7 +42,8 @@ class userInfluenceRankTask implements task {
             );
         }
         $con->close();
-        $out=dbModel::insert($con2=dbModel::connect(conf::$DB['DB_HOST'], conf::$DB['DB_USERNAME'], conf::$DB['DB_PASSWORD'], conf::$DB['DB_DATABASE'], conf::$DB['DB_PORT']), 'user_influence_daily_statistics', 'user_id,date,all_score,area_rank,all_rank', $sql_arr);
+        $con2=dbModel::connect(conf::$DB['DB_HOST'], conf::$DB['DB_USERNAME'], conf::$DB['DB_PASSWORD'], conf::$DB['DB_DATABASE'], conf::$DB['DB_PORT']);
+        $out=dbModel::insert($con2, 'user_influence_daily_statistics', 'user_id,date,all_score,area_rank,all_rank', $sql_arr);
         $con2->close();
         return $out;
     }

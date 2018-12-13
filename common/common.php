@@ -30,7 +30,7 @@ function my_dir($dir) {
 /**
  * shell输出
  */
-function shellOut($str,$wait=0) {
+function shellOut($str,$wait=0,$child=0) {
     if($wait===1){
         usleep(200000);
     }
@@ -39,7 +39,12 @@ function shellOut($str,$wait=0) {
         echo $txt;
     }
     $date= date("Ymd");
-    $myfile = fopen(__DIR__ ."/../log/".$date."_log.txt", "a") or die("Unable to open file!");
+    if($child==1){
+        $myfile = fopen(__DIR__ ."/../log/".$date."_child_log.txt", "a") or die("Unable to open file!");
+    }else{
+        $myfile = fopen(__DIR__ ."/../log/".$date."_log.txt", "a") or die("Unable to open file!");
+    }
+   
     fwrite($myfile, $txt);
     fclose($myfile);
 }
