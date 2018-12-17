@@ -75,7 +75,7 @@ while (true) {
                 include_once __DIR__ .'/task/' . $value;
                 //判断执行时间是否已经到了
                 $exec_time = $tmp[0]::getRunTime();
-                if ($exec_time['time'] != $now) {
+                if ($exec_time['time'] > $now) {
                     continue;
                 }
                 //新建进程执行
@@ -90,16 +90,16 @@ while (true) {
                         'taskName' => $tmp[0],
                         'watchTimes' => 1
                     );
-                    shellOut("创建{$tmp[0]}子进程成功，并进入线程池监控");
+                    shellOut("创建{$pid}号{$tmp[0]}子进程成功，并进入线程池监控". json_encode($processPool));
                 } else {// 子进程处理
-                    $out[] = array(
+                    $out = array(
                         'taskName' => $tmp[0]::getTaskName(),
                         'runTime' => $tmp[0]::getRunTime(),
                         'responsiblePeopleName' => $tmp[0]::getResponsiblePeopleName(),
                         'out' => $tmp[0]::run()
                     );
                     //保存执行结果TODO
-                    shellOut("子进程{$tmp[0]}结束运行，返回结果：" . json_encode($out,0,1));
+                    shellOut("子进程{$tmp[0]}结束运行，返回结果：" . json_encode($out));
                     exit;
                 }
             }
